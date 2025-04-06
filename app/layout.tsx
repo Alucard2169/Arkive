@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from "@/components/ui/sonner"
-import { ThemeProvider } from './components/theme-provider'
+import { ThemeProvider } from './components/Theme-provider'
 import { ModeToggle } from './components/ThemeToggle'
 
 
