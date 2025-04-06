@@ -12,18 +12,9 @@ html, body{
   width: 100dvw;
 }
 
-[data-theme='dark'] {
-  --bg: #121212;
-  --text: #ffffff;
-  --compbg: #333333; 
+html {
+  scroll-behavior: smooth;
 }
-
-[data-theme="light"] {
-  --bg: #D9D9D9;
-  --text: #000000;
-  --compbg: #E0E0E0; 
-}
-
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

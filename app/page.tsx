@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function Home() {
@@ -7,10 +8,9 @@ export default function Home() {
       <h1 className="text-6xl underline decoration-red-500 decoration-wavy decoration-2 font-bold">Arkive</h1>
       <p className="text-lg">A modern archive for all your curated knowledge. (it’s open source)</p>
       </section>
-      <button
-        className="px-3 py-2 font-bold rounded-lg transition-colors hover:scale-105 transition-transform"
-        style={{backgroundColor: "var(--compbg)", color: "var(--text)"}}
-      ><Link href="/auth">Join to get started</Link></button>
+      <Button
+        variant="ghost"
+        className="px-3 text-md py-2 font-bold rounded-lg hover:scale-105 transition-transform"><Link href="/signup">Join to get started</Link></Button>
     </main>
   );
 }

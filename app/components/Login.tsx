@@ -18,14 +18,9 @@ import { Eye, EyeOff} from "lucide-react";
 import googleIcon from "@/public/icons/googleIcon.svg";
 import Image from "next/image";
 import Link from "next/link";
-import { toast } from "sonner"
 
-
+// Enhanced password validation
 const User = z.object({
-  username: z
-    .string({ required_error: "Username is required" })
-    .min(10, "Username must be at least 10 characters long")
-    .max(15, "Username must be at most 15 characters long"),
   email: z
     .string({ required_error: "Email is required" })
     .email("Invalid email address"),
@@ -39,13 +34,12 @@ const User = z.object({
     .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
 });
 
-export function ProfileForm() {
+export function Login() {
   const [showPassword, setShowPassword] = useState(false);
-
+  
   const form = useForm<z.infer<typeof User>>({
     resolver: zodResolver(User),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
     },
@@ -53,33 +47,14 @@ export function ProfileForm() {
 
   function onSubmit(values: z.infer<typeof User>) {
     console.log(values);
-  
-    toast("Please verify your email", {
-      action: {
-        label: "Okay",
-        onClick: () => console.log("Okay"),
-      },
-    })
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6 w-2/5 p-4">
-      <h1 className="font-black text-2xl">Sign Up</h1>
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-bold text-lg">Username</FormLabel>
-              <FormControl>
-                <Input placeholder="Ichigo Kurosaki" {...field}/>
-              </FormControl>
-              <FormMessage/>
-            </FormItem>
-          )}
-        />
+      <h1 className="font-black text-2xl">Login</h1>
 
+        {/* Email Field */}
         <FormField
           control={form.control}
           name="email"
@@ -94,6 +69,7 @@ export function ProfileForm() {
           )}
         />
 
+        {/* Password Field with Visibility Toggle */}
         <FormField
           control={form.control}
           name="password"
@@ -121,14 +97,16 @@ export function ProfileForm() {
           )}
         />
 
-      <Button type="button" variant="secondary" className="flex bg-white text-black font-bold gap-2 items-center w-1/2 mr-auto ml-auto">
+        <Button type="button" variant="secondary" className="flex bg-white text-black font-bold gap-2 items-center w-1/2 mr-auto ml-auto">
         <Image src={googleIcon} alt="Google Logo" width={25} height={25} />
         Continue with Google
-      </Button>
+        </Button>
 
 
+        {/* Submit Button */}
         <Button type="submit" variant="ghost" className="cursor-pointer w-1/2 mr-auto ml-auto font-bold">Submit</Button>
-        <p>Already a user? <Link href="/login" className="underline">Login</Link></p>
+        <Button type="button" variant="secondary" className="mr-auto"><Link href="/email_verify">Forgot Password?</Link></Button>
+        <p>Already a user? <Link href="/signup" className="underline">Sign Up</Link></p>
       </form>
       
     </Form>
