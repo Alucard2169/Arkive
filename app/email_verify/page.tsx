@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const page = () => {
+const Page = () => {
     return ( 
         <main className="h-full flex justify-center items-center">
             <section className="flex flex-col gap-8 w-2/5">
@@ -17,4 +17,4 @@ const page = () => {
      );
 }
  
-export default page;
+export default Page;

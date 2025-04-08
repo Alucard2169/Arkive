@@ -1,6 +1,6 @@
 import { PasswordReset } from "../components/PasswordReset";
 
-const page = () => {
+const Page = () => {
     return ( 
         <main className="h-full flex flex-col justify-center items-center">
             <h1 className="font-black text-2xl">Password Reset</h1>
@@ -9,4 +9,4 @@ const page = () => {
      );
 }
  
-export default page;
+export default Page;

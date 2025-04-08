@@ -1,6 +1,6 @@
 import { Login } from "../components/Login";
 
-const page = () => {
+const Page = () => {
     return ( 
         <main className="h-full flex flex-col justify-center items-center">
             <Login/>
@@ -8,4 +8,4 @@ const page = () => {
      );
 }
  
-export default page;
+export default Page;

@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,14 +13,14 @@ import { RotateCw } from "lucide-react";
 import { FC } from "react";
   
 // Define the type for the props
-interface ItemCardProps {
-    title: string;
-    description: string; 
+interface ServiceCardProps {
+    title: string | undefined;
+    description: string | undefined; 
     totalEntries: number;
     lastUpdated: string;
 
 }
-const ItemCard:FC<ItemCardProps> = ({title, description,totalEntries, lastUpdated}) => {
+const ServiceCard:FC<ServiceCardProps> = ({title, description,totalEntries, lastUpdated}) => {
     return ( 
         <Card>
   <CardHeader className="flex flex-row items-top justify-between">
@@ -26,7 +28,19 @@ const ItemCard:FC<ItemCardProps> = ({title, description,totalEntries, lastUpdate
    <CardTitle>{title}</CardTitle>
    <CardDescription>{description}</CardDescription>
    </div>
-   <Button variant="ghost" title="Update Now"><RotateCw/></Button>
+   <Button 
+  variant="ghost" 
+  type="button"
+  title="Update Now"
+  onClick={(e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log(`Trigger update for ${title}`);
+    // TODO: trigger fetch/update here
+  }}
+>
+  <RotateCw />
+</Button>
   </CardHeader>
   <CardContent>
     <p className="text-sm">Total Entries: {totalEntries} </p>
@@ -39,4 +53,4 @@ const ItemCard:FC<ItemCardProps> = ({title, description,totalEntries, lastUpdate
      );
 }
  
-export default ItemCard;
+export default ServiceCard;

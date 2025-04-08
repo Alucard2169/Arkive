@@ -15,7 +15,7 @@ import { Bookmark, Code, LayoutDashboard, NotebookTabs, Rss, Star, Video } from 
 const items = [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: LayoutDashboard,
     },
     {

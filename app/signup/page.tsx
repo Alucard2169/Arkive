@@ -1,6 +1,6 @@
 import { ProfileForm } from "../components/Signup";
 
-const page = () => {
+const Page = () => {
     return ( 
         <main className="h-full flex flex-col justify-center items-center">
             <ProfileForm/>
@@ -8,4 +8,4 @@ const page = () => {
      );
 }
  
-export default page;
+export default Page;
