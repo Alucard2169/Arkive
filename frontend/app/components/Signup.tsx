@@ -45,8 +45,30 @@ export function ProfileForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof User>) {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof User>) =>{
+    const { username, password } = values;
+
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+  })
+    if (res.ok) {
+      toast("User created successfully", { description: "You can now login" });
+      console.log(res)
+      form.reset(); 
+    } else {
+      const error = await res.json();
+      if(res.status == 409){
+        form.setError("username", { type: "manual", message: error.detail });
+      }
+      else{
+        toast.error(error.message);
+      }
+      
+    }
   }
 
   return (

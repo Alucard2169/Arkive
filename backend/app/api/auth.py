@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from app.core.config import settings
 import jwt
-from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi import Depends, APIRouter, HTTPException, status, Response, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
@@ -19,6 +19,10 @@ fake_users_db = {
     "johndoe": {
         "username": "johndoe",
         "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
+    },
+    "alucard2169":{
+        "username": "Alucard2169",
+        "hashed_password": "$2b$12$gS/ndJ/yDubaiiTZzuy1S.FZGX7Kj4XLXgiTGuidrgABRQCumtekG",
     }
 }
 
@@ -34,8 +38,9 @@ class TokenData(BaseModel):
 
 class User(BaseModel):
     username: str
-    email: str | None = None
-    full_name: str | None = None
+    password: str
+
+
 
 
 class UserInDB(User):
@@ -104,10 +109,65 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 
-@authRouter.post("/token")
-async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+@authRouter.get("/verify")
+async def verify_token(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Token not found")
+    try:
+        token = token.replace("Bearer ", "")
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return {"valid": True, "user": payload.get("sub")}
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")   
+    
+    
+    
+@authRouter.post("/signup")
+async def signup(
+    user_data: User,
+    response: Response,
+):
+    if user_data.username in fake_users_db:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Username already in use",
+        )
+    hashed_password = get_password_hash(user_data.password)
+    print(hashed_password)
+    fake_users_db[user_data.username] = {
+        "username": user_data.username,
+        "hashed_password": hashed_password,
+    }
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user_data.username}, expires_delta=access_token_expires
+    )
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {access_token}",
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        path="/",
+    )
+    return {"message":"Signup Successful"}
+
+
+
+@authRouter.post("/logout")
+async def logout(response: Response):
+    response.delete_cookie("access_token")
+    return {"message": "Logged out"}
+
+
+@authRouter.post("/login")
+async def login(
+    response: Response,
+    form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Token:
+
     user = authenticate_user(fake_users_db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -115,44 +175,22 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.username},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    return Token(access_token=access_token, token_type="bearer")
 
-
-
-@authRouter.post("/signup")
-async def signup(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-) -> Token:
-    if form_data.username in fake_users_db:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already in use",
-        )
-    hashed_password = get_password_hash(form_data.password)
-    fake_users_db[form_data.username] = {
-        "username": form_data.username,
-        "hashed_password": hashed_password,
-    }
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": form_data.username}, expires_delta=access_token_expires
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {access_token}",
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        path="/",
     )
-    return Token(access_token=access_token, token_type="bearer")
+
+    return {"message": "Login successful", "username": user.username}
 
 
-@authRouter.get("/users/me/", response_model=User)
-async def read_users_me(
-    current_user: Annotated[User, Depends()],
-):
-    return current_user
-
-
-@authRouter.get("/users/me/items/")
-async def read_own_items(
-    current_user: Annotated[User, Depends()],
-):
-    return [{"item_id": "Foo", "owner": current_user.username}]
