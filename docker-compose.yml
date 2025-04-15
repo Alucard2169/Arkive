@@ -2,44 +2,41 @@ services:
   backend:
     build: 
       context: ./backend
-    container_name: fastapi-backend
+    container_name: arkive-backend
     ports:
       - "8000:8000"
     env_file:
       - .env
-    depends_on:
-      - mailhog
     networks:
-      - backend-net
+      - arkive-net
     volumes:
       - ./backend:/app 
+      - arkive-db:/app/db
       - /app/venv
-  
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend 
-    container_name: frontend
+    container_name: arkive-frontend
     ports:
       - "3000:3000"
     env_file:
       - .env 
     networks:
-      - backend-net
+      - arkive-net
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
 
-  mailhog:
-    image: mailhog/mailhog
-    container_name: dev-mailhog
-    ports:
-      - "1025:1025"
-      - "8025:8025"
-    networks:
-      - backend-net
+
+volumes:
+  arkive-db:
 
 networks:
-  backend-net:
+  arkive-net:
     driver: bridge
 

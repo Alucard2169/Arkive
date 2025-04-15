@@ -15,15 +15,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Eye, EyeOff} from "lucide-react";
-import googleIcon from "@/public/icons/googleIcon.svg";
-import Image from "next/image";
 import Link from "next/link";
 
 // Enhanced password validation
 const User = z.object({
-  email: z
-    .string({ required_error: "Email is required" })
-    .email("Invalid email address"),
+  username: z
+    .string({ required_error: "Username is required" })
+    .min(10, "Username must be at least 10 characters long")
+    .max(15, "Username must be at most 15 characters long"),
   password: z
     .string({ required_error: "Password is required" })
     .min(8, "Password must be at least 8 characters long")
@@ -40,7 +39,7 @@ export function Login() {
   const form = useForm<z.infer<typeof User>>({
     resolver: zodResolver(User),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -54,13 +53,12 @@ export function Login() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6 w-2/5 p-4">
       <h1 className="font-black text-2xl">Login</h1>
 
-        {/* Email Field */}
         <FormField
           control={form.control}
-          name="email"
+          name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-bold text-lg">Email</FormLabel>
+              <FormLabel className="font-bold text-lg">Username</FormLabel>
               <FormControl>
                 <Input placeholder="soul.society@bankai.com" {...field} />
               </FormControl>
@@ -97,15 +95,9 @@ export function Login() {
           )}
         />
 
-        <Button type="button" variant="secondary" className="flex bg-white text-black font-bold gap-2 items-center w-1/2 mr-auto ml-auto">
-        <Image src={googleIcon} alt="Google Logo" width={25} height={25} />
-        Continue with Google
-        </Button>
-
-
         {/* Submit Button */}
         <Button type="submit" variant="ghost" className="cursor-pointer w-1/2 mr-auto ml-auto font-bold">Submit</Button>
-        <Button type="button" variant="secondary" className="mr-auto"><Link href="/email_verify">Forgot Password?</Link></Button>
+        <Button type="button" variant="secondary" className="mr-auto"><Link href="/password_reset">Forgot Password?</Link></Button>
         <p>Already a user? <Link href="/signup" className="underline">Sign Up</Link></p>
       </form>
       

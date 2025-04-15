@@ -15,8 +15,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Eye, EyeOff} from "lucide-react";
-import googleIcon from "@/public/icons/googleIcon.svg";
-import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner"
 
@@ -26,9 +24,6 @@ const User = z.object({
     .string({ required_error: "Username is required" })
     .min(10, "Username must be at least 10 characters long")
     .max(15, "Username must be at most 15 characters long"),
-  email: z
-    .string({ required_error: "Email is required" })
-    .email("Invalid email address"),
   password: z
     .string({ required_error: "Password is required" })
     .min(8, "Password must be at least 8 characters long")
@@ -46,20 +41,12 @@ export function ProfileForm() {
     resolver: zodResolver(User),
     defaultValues: {
       username: "",
-      email: "",
       password: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof User>) {
     console.log(values);
-  
-    toast("Please verify your email", {
-      action: {
-        label: "Okay",
-        onClick: () => console.log("Okay"),
-      },
-    })
   }
 
   return (
@@ -74,20 +61,6 @@ export function ProfileForm() {
               <FormLabel className="font-bold text-lg">Username</FormLabel>
               <FormControl>
                 <Input placeholder="Ichigo Kurosaki" {...field}/>
-              </FormControl>
-              <FormMessage/>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-bold text-lg">Email</FormLabel>
-              <FormControl>
-                <Input placeholder="soul.society@bankai.com" {...field} />
               </FormControl>
               <FormMessage/>
             </FormItem>
@@ -120,11 +93,6 @@ export function ProfileForm() {
             </FormItem>
           )}
         />
-
-      <Button type="button" variant="secondary" className="flex bg-white text-black font-bold gap-2 items-center w-1/2 mr-auto ml-auto">
-        <Image src={googleIcon} alt="Google Logo" width={25} height={25} />
-        Continue with Google
-      </Button>
 
 
         <Button type="submit" variant="ghost" className="cursor-pointer w-1/2 mr-auto ml-auto font-bold">Submit</Button>

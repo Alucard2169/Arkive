@@ -1,6 +1,9 @@
 fastapi[standard]
 uvicorn[standard]
-pydantic
 python-dotenv
 httpx
 aiosmtplib
+sqlalchemy
+passlib[bcrypt]
+pyjwt
+pydantic-settings
