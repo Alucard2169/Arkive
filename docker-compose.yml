@@ -1,0 +1,40 @@
+services:
+  backend:
+    build: 
+     context: ./backend 
+    container_name: arkive-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    networks:
+      - arkive-net 
+    volumes:
+      - ./backend:/app
+      - arkive-db:/app/db 
+      - /app/venv
+    restart: unless-stopped
+
+  frontend:
+    build:
+     context: ./frontend
+    container_name: arkive-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - arkive-net
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  arkive-db:
+  
+networks:
+  arkive-net:
+    driver: bridge
