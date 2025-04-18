@@ -1,51 +1,40 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { verifyToken } from "./app/utils/verify";
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get('access_token')?.value
-  const { pathname } = request.nextUrl
+  const token = request.cookies.get("access_token");
+  const {pathname} = request.nextUrl;
 
-  if (['/login', '/signup', '/'].includes(pathname)) {
-    if (token) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+
+  if (!token) {
+    if(pathname.startsWith('/dashboard') || pathname.startsWith('/profile')){
+      return NextResponse.redirect(new URL('/login', request.url));
     }
-    return NextResponse.next()
-  }
+    return NextResponse.next();
   
-  if (pathname.startsWith('/dashboard') || pathname.startsWith('/profile')) {
-    if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
+  }
+
+  try {
+    const isValid = await verifyToken(token.value);
     
-    try {
-      const url = new URL('/api/auth/verify', request.url)
-      const authCheck = await fetch(url.toString(), {
-        headers: { 
-          Cookie: `access_token=${token}`,
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      })
-      
-      if (!authCheck.ok) {
-        throw new Error('Invalid token')
-      }
-      
-      // Token is valid, proceed
-      return NextResponse.next()
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      console.error('Token verification failed:', errorMessage)
-      const response = NextResponse.redirect(new URL('/login', request.url))
-      response.cookies.delete('access_token')
-      return response
+    if (!isValid) {
+      console.log('Token verification failed, redirecting to login');
+      return NextResponse.redirect(new URL('/login', request.url));
     }
+
+    if(pathname === '/') return NextResponse.redirect(new URL('/dashboard', request.url))
+
+    return NextResponse.next();
+
+  } catch (error) {
+    console.error('Error during token verification:', error);
+    return NextResponse.redirect(new URL('/login', request.url));
   }
-  
-  return NextResponse.next()
 }
 
-// Define which paths this middleware applies to
 export const config = {
-  matcher: ['/dashboard/:path*', '/profile/:path*', '/login', '/signup', '/']
+  matcher: ['/','/dashboard/:path*', '/profile/:path*'],
 }
+
+

@@ -48,7 +48,7 @@ export function ProfileForm() {
   const onSubmit = async (values: z.infer<typeof User>) =>{
     const { username, password } = values;
 
-    const res = await fetch("/auth/register", {
+    const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: {
           "Content-Type": "application/json",
@@ -62,7 +62,7 @@ export function ProfileForm() {
     } else {
       const error = await res.json();
       if(res.status == 409){
-        form.setError("username", { type: "manual", message: error.detail });
+        form.setError("username", { type: "manual", message: error.detail.message });
       }
       else{
         toast.error(error.message);

@@ -8,6 +8,7 @@ from utils.passwordHash import get_password_hash, verify_password
 from utils.authToken import create_access_token
 from datetime import timedelta
 import jwt
+from jwt import ExpiredSignatureError, InvalidTokenError
 from core.config import settings
 
 
@@ -37,43 +38,40 @@ class LoginResponse(BaseModel):
     user: dict
     
     
+ 
 
 @authRouter.get("/verify")
-async def verify_token(request: Request):
-    token = request.cookies.get("access_token")
-    if not token or not token.startswith("Bearer "):
+def verify_access_token(request: Request):
+    auth_header = request.headers.get("Authorization")
+    
+    if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"message": "Not authenticated"},
+            detail="No token found in Authorization header",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
-    token = token.replace("Bearer ", "")
+        
+    token = auth_header.split(" ")[1]
+    print(auth_header)
     
     try:
-        # Use your existing token verification logic
-        payload = jwt.decode(
-            token, 
-            settings.SECRET_KEY, 
-            algorithms=[settings.ALGORITHM]
-        )
-        username: str = payload.get("sub")
-        if username is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail={"message": "Invalid authentication credentials"},
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        
-        # You can optionally return user information here
-        return {"authenticated": True, "username": username}
-        
-    except jwt.JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"message": "Invalid token or expired token"},
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        return {"authenticated": True, "username": payload.get("sub")}
+    
+    except ExpiredSignatureError:
+        print("Token expired:", token)
+        raise HTTPException(status_code=401, detail="Token expired")
+    
+    except InvalidTokenError as e:
+        print(f"Invalid token error: {e}")
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+            
 
 @authRouter.post("/register")
 async def register_user(response: Response, user: UserCreate, db: Session = Depends(get_db)):
@@ -96,7 +94,7 @@ async def register_user(response: Response, user: UserCreate, db: Session = Depe
     )
     response.set_cookie(
         key="access_token",
-        value=f"Bearer {access_token}",
+        value= access_token,
         httponly=True,
         secure=True,
         samesite="lax",
@@ -131,7 +129,7 @@ async def login_user(response: Response, user: UserLogin, db: Session = Depends(
 
     response.set_cookie(
         key="access_token",
-        value=f"Bearer {access_token}",
+        value=f"{access_token}",
         httponly=True,
         secure=True if not settings.DEBUG else False,
         samesite="lax",

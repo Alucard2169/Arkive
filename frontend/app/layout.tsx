@@ -8,7 +8,6 @@ import { ModeToggle } from './components/ThemeToggle'
 export const metadata: Metadata = {
   title: 'Arkive - A modern archive',
   description: 'Arkive is a project that aims to keep all your knowledge in one place (bookmarks, notes, etc.)',
-  
 }
  
 export default async function RootLayout({
@@ -16,7 +15,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-
+  
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="transition-colors relative">
