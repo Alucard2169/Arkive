@@ -1,3 +1,5 @@
+"use client"
+
 import { ChevronUp, Import, Keyboard, Link, LogOut, Settings, User2 } from "lucide-react";
 
 import {
@@ -15,9 +17,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { logout } from "../utils/logout";
+
 
 
 const SidebarDropMenu = () => {
+
     return ( 
         <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -42,7 +47,7 @@ const SidebarDropMenu = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem className="flex w-full justify-between">Import Bookmarks <Import/></DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" className="flex w-full justify-between">
+        <DropdownMenuItem onPointerDown={logout} variant="destructive" className="flex w-full justify-between">
           Log out <LogOut/>
         </DropdownMenuItem>
       </DropdownMenuContent>

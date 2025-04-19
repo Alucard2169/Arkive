@@ -17,6 +17,7 @@ import { z } from "zod";
 import { Eye, EyeOff} from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner"
+import { register } from "../utils/register";
 
 
 const User = z.object({
@@ -48,13 +49,8 @@ export function ProfileForm() {
   const onSubmit = async (values: z.infer<typeof User>) =>{
     const { username, password } = values;
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {
-          "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-  })
+    const res = await register({username,password});
+
     if (res.ok) {
       toast("User created successfully", { description: "You can now login" });
       console.log(res)

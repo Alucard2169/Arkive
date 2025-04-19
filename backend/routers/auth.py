@@ -52,7 +52,6 @@ def verify_access_token(request: Request):
         )
         
     token = auth_header.split(" ")[1]
-    print(auth_header)
     
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -138,3 +137,10 @@ async def login_user(response: Response, user: UserLogin, db: Session = Depends(
     )
     
     return {"message": "Login successful", "user": {"username": db_user.username, "id": db_user.id} }
+
+
+@authRouter.post("/logout")
+async def logout_user(response: Response):
+    response.delete_cookie(key="access_token")
+    response.status_code = 200
+    return response

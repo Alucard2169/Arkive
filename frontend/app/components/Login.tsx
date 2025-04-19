@@ -10,6 +10,7 @@ import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { login } from "../utils/login";
 
 
 const LoginSchema = z.object({
@@ -29,14 +30,7 @@ export function Login() {
     try {
       const { username, password } = values;
   
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ username, password }),
-      });
+      const res = await login({username,password});
   
       if (res.ok) {
         router.push('/dashboard');
