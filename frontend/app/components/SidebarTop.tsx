@@ -2,8 +2,8 @@ import {
     SidebarContent,
     SidebarGroup,
     SidebarGroupContent,
-    SidebarGroupLabel,
     SidebarMenu,
+    SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem
 } from "@/components/ui/sidebar";
@@ -57,9 +57,8 @@ const SidebarTop = () => {
     return (  
         <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-lg font-bold">Arkive</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="p-1 flex flex-col gap-4">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
@@ -68,6 +67,7 @@ const SidebarTop = () => {
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
+                  <SidebarMenuBadge>10</SidebarMenuBadge>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

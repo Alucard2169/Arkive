@@ -1,8 +1,8 @@
 const Page = () => {
     return ( 
-        <div>
-            <h1>Hello World</h1>
-        </div>
+        <section className="p-4">
+            <h1>Github</h1>
+        </section>
      );
 }
  

@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-from dependencies.database import engine, Base
+from dependencies.database import engine
+from dependencies.base import Base
 from routers.auth import authRouter
 from fastapi.middleware.cors import CORSMiddleware
 from core.config import settings
+from models import * 
 
 
 
