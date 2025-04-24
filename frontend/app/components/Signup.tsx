@@ -53,7 +53,6 @@ export function ProfileForm() {
 
     if (res.ok) {
       toast("User created successfully", { description: "You can now login" });
-      console.log(res)
       form.reset(); 
     } else {
       const error = await res.json();
@@ -61,7 +60,7 @@ export function ProfileForm() {
         form.setError("username", { type: "manual", message: error.detail.message });
       }
       else{
-        toast.error(error.message);
+        form.setError("root", {type: "manual", message: error.detail.message})
       }
       
     }

@@ -33,7 +33,7 @@ export function Login() {
       const res = await login({username,password});
   
       if (res.ok) {
-        router.push('/dashboard');
+        router.replace('/dashboard');
       } else {
         const error = await res.json();
         form.setError("username", { 
@@ -44,6 +44,7 @@ export function Login() {
         });
       }
     } catch (err) {
+      console.error(err);
       form.setError("root", { 
         message: "Network error. Please try again later." 
       });

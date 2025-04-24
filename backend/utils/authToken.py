@@ -2,9 +2,10 @@ import jwt
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from core.config import settings
+from fastapi import Response
 
 
-print(settings.SECRET_KEY)
+
 
 def create_access_token(
     data: dict,
@@ -31,3 +32,16 @@ def create_access_token(
     except Exception as e:
         # Handle potential encoding errors
         raise ValueError(f"Error encoding JWT: {str(e)}")
+    
+    
+def set_auth_cookie(response: Response, token : str):
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=True if not settings.DEBUG else False,
+        samesite="lax",
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        path="/",
+    )
+    
